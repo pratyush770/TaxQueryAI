@@ -1,0 +1,58 @@
+City Name,Zone Name,Ward Name,Ward No.,2013-14 - Property Tax Collection (in crores) - Residential,2014-15 - Property Tax Collection (in crores) - Residential,2015-16 - Property Tax Collection (in crores) - Residential,2016-17 - Property Tax Collection (in crores) - Residential,2017-18 - Property Tax Collection (in crores) - Residential,2013-14 - Property Tax Demand (in crores) - Residential,2014-15 - Property Tax Demand (in crores) - Residential,2015-16 - Property Tax Demand (in crores) - Residential,2016-17 - Property Tax Demand (in crores) - Residential,2017-18 - Property Tax Demand (in crores) - Residential,2013-14 - Property Tax Collection (in crores) - Commercial,2014-15 - Property Tax Collection (in crores) - Commercial,2015-16 - Property Tax Collection (in crores) - Commercial,2016-17 - Property Tax Collection (in crores) - Commercial,2017-18 - Property Tax Collection (in crores) - Commercial,2013-14 - Property Tax Demand (in crores) - Commercial,2014-15 - Property Tax Demand (in crores) - Commercial,2015-16 - Property Tax Demand (in crores) - Commercial,2016-17 - Property Tax Demand (in crores) - Commercial,2017-18 - Property Tax Demand (in crores) -Commercial
+Smart City Solapur,City Area,SOUTH KASABA,NA,0.6,0.51,0.48,0.62,0.61,0.49,0.51,0.53,0.56,0.76,0.47,0.43,0.36,0.57,0.33,0.36,0.41,0.42,0.47,1.15
+Smart City Solapur,City Area,GOLD FINCH,NA,0.09,0.09,0.08,0.09,0.36,0.49,0.09,0.09,0.09,0.18,0.91,0.64,0.73,0.91,0.24,0.72,0.72,0.72,0.79,1.25
+Smart City Solapur,City Area,NORTH KASBA,NA,0.81,0.66,0.71,0.75,0.89,0.59,0.6,0.62,0.66,1.17,0.16,0.2,0.17,0.23,0.37,0.17,0.17,0.19,0.21,0.43
+Smart City Solapur,City Area,BUDHAWAR,NA,1.14,1.26,2.04,1.23,2.08,1.25,1.25,1.29,1.29,4.59,0.79,0.9,0.78,0.84,0.26,0.83,0.87,0.87,0.88,2.03
+Smart City Solapur,City Area,BHAVANI,NA,2.31,2.25,2.4,2.95,2.93,2.13,2.22,2.32,2.44,6.15,0.67,0.64,0.82,0.83,0.73,0.49,0.6,0.64,0.71,1.51
+Smart City Solapur,City Area,WEST MANGALWAR,NA,0.34,0.26,0.34,0.42,0.39,0.29,0.29,0.3,0.33,0.55,0.54,0.54,0.51,0.6,0.44,0.45,0.46,0.49,0.54,1.07
+Smart City Solapur,City Area,EAST MANGALWAR,NA,0.17,0.2,0.17,0.22,0.37,0.16,0.17,0.17,0.18,0.29,0.28,0.23,0.2,0.28,0.34,0.21,0.22,0.23,0.23,0.41
+Smart City Solapur,City Area,GURUWAR,NA,0.08,0.08,0.08,0.07,0.1,0.07,0.07,0.07,0.07,0.07,0.08,0.05,0.04,0.07,0.14,0.04,0.05,0.05,0.06,0.08
+Smart City Solapur,City Area,SOMWAR,NA,0.1,0.07,0.08,0.09,0.35,0.07,0.07,0.07,0.09,0.12,0.02,0.02,0.02,0.02,0.04,0.02,0.02,0.02,0.02,0.02
+Smart City Solapur,City Area,JODBHAVI,NA,0.33,0.31,0.32,0.41,0.42,0.32,0.32,0.33,0.34,0.69,0.19,0.21,0.16,0.23,0.48,0.19,0.2,0.21,0.22,0.57
+Smart City Solapur,City Area,GANESH,NA,0.04,0.04,0.05,0.04,0.06,0.04,0.04,0.04,0.04,0.06,0.06,0.06,0.04,0.07,0.07,0.06,0.06,0.06,0.06,0.21
+Smart City Solapur,City Area,SAKHAR,NA,0.32,0.3,0.34,0.36,0.37,0.28,0.29,0.31,0.34,0.59,0.14,0.21,0.18,0.16,0.36,0.16,0.16,0.18,0.19,0.4
+Smart City Solapur,City Area,RAVIWAR,NA,0.55,0.6,0.55,0.87,0.95,0.63,0.66,0.69,0.7,2.77,1.01,1.08,1.24,1.89,0.65,0.99,1,1.04,1.22,2.44
+Smart City Solapur,City Area,SHUKRAWAR,NA,0.27,0.26,0.27,0.33,0.42,0.24,0.25,0.27,0.29,0.69,0.13,0.1,0.09,0.17,0.33,0.12,0.12,0.12,0.14,0.45
+Smart City Solapur,City Area,SHANIWAR,NA,0.21,0.22,0.22,0.32,0.26,0.21,0.21,0.23,0.25,0.37,0.04,0.02,0.04,0.07,0.06,0.05,0.04,0.04,0.07,0.26
+Smart City Solapur,City Area,PACHHA,NA,3.26,2.84,3.29,3.67,3.64,2.84,2.95,3.1,3.23,6.6,1.1,1.06,1.31,1.47,1.67,1.04,1.1,1.14,1.32,2.23
+Smart City Solapur,City Area,NORTH SADAR BAZAR,NA,0.8,1.05,0.91,1.14,1.07,1.1,1.14,1.15,1.17,4.06,0.47,0.51,0.53,0.62,0.38,0.46,0.46,0.49,0.57,1.13
+Smart City Solapur,City Area,SOUTH SADAR BAZAR,NA,0.77,0.81,0.86,0.93,0.86,0.78,0.79,0.86,0.86,1.58,0.37,0.28,0.25,0.37,0.23,0.3,0.3,0.3,0.34,0.94
+Smart City Solapur,City Area,MODI ,NA,0.45,0.41,0.43,0.48,0.54,0.42,0.43,0.43,0.45,0.82,0.2,0.22,0.37,0.38,0.1,0.17,0.17,0.43,0.42,1.39
+Smart City Solapur,City Area,RAILWAY LINE,NA,1.16,1.21,1.44,1.45,1.48,1.37,1.39,1.45,1.53,9.69,1.84,1.96,2.22,2.37,0.5,1.97,2.09,2.29,2.48,9.38
+Smart City Solapur,City Area,SIDDHESHWAR,NA,0.23,0.19,0.29,0.32,0.42,0.22,0.23,0.23,0.28,0.73,0.6,0.69,0.75,0.93,0.11,0.76,0.81,0.81,0.87,3.18
+Smart City Solapur,City Area,BEGAM,NA,0.14,0.15,0.14,0.23,0.16,0.15,0.15,0.15,0.15,0.3,0.05,0.05,0.06,0.07,0.12,0.06,0.05,0.05,0.06,0.13
+Smart City Solapur,City Area,MORARJI,NA,2.77,2.5,2.67,3.12,2.62,2.14,2.42,2.58,2.57,6.62,1.41,1.34,1.51,1.98,0.64,1.28,1.31,1.36,1.46,2.98
+Smart City Solapur,City Area,LAXMI,NA,2.4,2.46,2.24,2.23,2.66,1.26,1.64,2.12,1.71,6.25,0.15,0.15,0.24,0.19,0.06,0.18,0.16,0.16,0.22,0.52
+Smart City Solapur,City Area,A. AREA,NA,0.61,0.46,0.49,0.62,1.05,0.58,0.63,0.68,0.68,4.08,0.1,0.07,0.08,0.08,0.19,0.07,0.08,0.08,0.09,0.31
+Smart City Solapur,City Area,NEW TIRHEGAON ,NA,0.12,0.08,0.09,0.12,0.29,0.11,0.11,0.11,0.12,0.38,0.01,0,0.01,0.01,0.03,0.01,0.01,0.01,0.01,0.06
+Smart City Solapur,City Area,CIVIL LINE,NA,1.47,1.2,1.2,1.44,2.15,1.16,1.24,1.26,1.2,3.77,0.47,0.49,0.45,0.97,0.14,0.51,0.51,0.52,0.55,1.52
+Smart City Solapur,City Area,NEW A.AREA,NA,0.01,0.01,0.03,0.02,0.86,0.07,0.07,0.07,0.08,0.6,0,0,0,0,0,0.02,0.02,0.02,0.02,0.3
+Smart City Solapur,City Area,HOTAGI ROAD,NA,1.4,1.36,1.25,1.53,2.69,1.24,1.31,1.36,1.36,3.59,0.25,0.32,0.35,0.47,0.31,0.26,0.28,0.28,0.34,1.31
+Smart City Solapur,City Area,VIJAPUR ROAD,NA,1.82,1.7,1.7,2,1.92,1.72,1.76,1.77,1.76,2.61,0.43,0.47,0.31,0.54,0.31,0.38,0.39,0.39,0.41,0.78
+Smart City Solapur,City Area,SALGAR VASTI,NA,0.17,0.12,0.14,0.21,0.28,0.15,0.17,0.21,0.19,1.96,0,0,0,0.01,0.08,0,0,0,0,0.06
+Smart City Solapur,City Area,BIDI GHARKUL,NA,2.13,2.23,2.4,2.6,4.55,2.19,2.23,2.25,2.28,11.64,0.07,0.07,0.09,0.19,0.44,0.08,0.09,0.09,0.09,0.38
+Smart City Solapur,City Area,BIDI GHARKUL -2,NA,0.19,0.24,0.46,0.55,0,0.02,0.11,0.19,0.29,0,0,0,0.03,0.05,0,0,0,0,0.02,0
+Smart City Solapur,City Area,PACCHA - 2,NA,0,0,0.03,0.18,0,0,0,0,0.03,0,0,0,0.01,0.42,0,0,0,0,0.02,0
+Smart City Solapur,Extension Area,SHELGI,NA,1.86,1.95,2.21,2.42,1.598,1.83,1.95,2.16,2.16,8.02,0.09,0.07,0.09,0.14,0.11,0.08,0.09,0.08,0.12,0.13
+Smart City Solapur,Extension Area,DAHITANE,NA,0.52,0.55,0.65,0.86,0.603,0.48,0.55,0.62,0.56,3.79,0.12,0.08,0.05,0.14,0.09,0.06,0.07,0.08,0.09,0.03
+Smart City Solapur,Extension Area,DEGAON,NA,0.2,0.36,0.28,0.36,0.557,0.31,0.36,0.38,0.36,3.25,0.03,0.01,0.05,0.08,0.09,0.03,0.03,0.03,0.05,0.02
+Smart City Solapur,Extension Area,KUMATHE,NA,0.52,0.77,0.6,1.02,0.72,0.72,0.77,1.12,0.95,7.42,0.19,0.15,0.24,0.26,0.36,0.17,0.17,0.17,0.22,0.16
+Smart City Solapur,Extension Area,KEGAON,NA,0.32,0.33,0.18,0.24,0.221,0.25,0.33,0.35,0.27,2.38,0.68,0.77,0.27,0.88,1.13,0.58,0.95,0.95,1.04,1.74
+Smart City Solapur,Extension Area,SOREGAON,NA,3.31,3.12,3.41,3.48,4.364,2.99,3.12,3.25,3.27,19,0.72,0.53,0.51,0.81,1.24,0.36,0.59,0.6,0.67,1.32
+Smart City Solapur,Extension Area,BALE,NA,1.43,1.81,2.04,2.47,2.352,1.59,1.81,2.02,1.91,9.84,0.2,0.17,0.17,0.23,0.28,0.24,0.21,0.19,0.22,0.09
+Smart City Solapur,Extension Area,KASBE SOLAPUR,NA,1.6,1.83,1.99,2.01,2.905,1.82,1.83,1.85,1.82,16.2,1.99,1.77,1.68,2.39,2.14,2.05,2.08,2.09,2.2,0.8
+Smart City Solapur,Extension Area,MAJREWADI -1,NA,1,0.93,0.98,0.98,0.618,0.9,0.93,0.97,0.98,3.63,0.13,0.11,0.08,0.09,0.1,0.07,0.08,0.09,0.1,0.06
+Smart City Solapur,Extension Area,MAJREWADI -2,NA,1.7,1.64,1.97,2.09,1.315,1.59,1.64,1.72,1.71,3.85,0.23,0.11,0.18,0.25,0.22,0.13,0.13,0.15,0.18,0.07
+Smart City Solapur,Extension Area,MAJREWADI -3,NA,3.31,2.98,3.52,3.75,2.609,2.85,2.98,3.2,3.13,8.72,0.92,0.88,0.89,1.01,0.98,0.57,0.78,0.83,0.91,0.11
+Smart City Solapur,Extension Area,MAJREWADI -4,NA,3.35,3.02,3.62,3.4,3.086,2.67,3.02,3.26,3.01,10.71,0.28,0.42,0.38,0.41,0.48,0.21,0.39,0.36,0.41,0.1
+Smart City Solapur,Extension Area,MAJREWADI -5,NA,1.2,1.23,1.32,1.32,0.934,1.17,1.23,1.27,1.26,4.26,0.15,0.1,0.11,0.2,0.19,0.15,0.16,0.16,0.18,0.12
+Smart City Solapur,Extension Area,MAJREWADI -6,NA,0.92,1.05,1.19,1.12,0.683,1.03,1.05,1.13,1.15,3.79,0.3,0.32,0.28,0.49,0.23,0.27,0.33,0.34,0.35,0.12
+Smart City Solapur,Extension Area,MAJREWADI -7,NA,0.79,0.93,1.17,0.88,0.632,0.91,0.93,0.99,1.01,3.79,0.05,0.03,0.05,0.1,0.09,0.05,0.05,0.05,0.07,0.05
+Smart City Solapur,Extension Area,MAJREWADI -8,NA,0.8,0.88,1.06,1.01,0.602,0.85,0.88,0.95,0.95,4.04,0.05,0.04,0.07,0.07,0.08,0.04,0.04,0.05,0.06,0.09
+Smart City Solapur,Extension Area,MAJREWADI -9,NA,0.47,0.81,0.67,0.71,0.629,0.72,0.81,0.94,0.8,6.54,0.03,0.04,0.04,0.06,0.03,0.04,0.04,0.04,0.05,0.04
+Smart City Solapur,Extension Area,MAJREWADI -10,NA,0.56,0.61,0.74,0.54,0.458,0.57,0.61,0.63,0.66,2.91,0.05,0.04,0.05,0.03,0.06,0.03,0.04,0.04,0.05,0.06
+Smart City Solapur,Extension Area,SOREGAON-2,NA,1.17,1.44,2.07,2.73,0,0.98,1.44,2.12,1.74,0,0.15,0.49,0.28,0.38,0,0.07,0.09,0.23,0.29,0
+Smart City Solapur,Extension Area,KASBE SOLAPUR-2,NA,0.66,0.78,1.04,1.62,0,0.59,0.78,1.05,0.98,0,0.12,0.13,0.23,0.27,0,0.09,0.1,0.13,0.24,0
+Smart City Solapur,Extension Area,MAJREWADI -3(2),NA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Smart City Solapur,Extension Area,MAJREWADI -4(2),NA,0,0,0.04,0.29,0,0,0,0,0.03,0,0,0,0,0,0,0,0,0,0,0
+Smart City Solapur,Slum Area,NA,NA,2.96,2.44,3.47,4.09,3.4,6.62,7.03,8.9,9.92,10,0.1,0.06,0.09,0.09,0.08,0.3,0.21,0.25,0.28,0.3

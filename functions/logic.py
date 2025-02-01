@@ -112,6 +112,10 @@ def get_prediction_response(user_query: str, city: str, property_type: str, year
 
 
 def get_sql_response(user_query: str, db: SQLDatabase, chat_history: list):
+    # check if the user is expressing gratitude
+    gratitude_keywords = ["thanks", "thank you", "thx", "appreciate", "grateful"]
+    if any(word in user_query.lower() for word in gratitude_keywords):
+        return "You're welcome! Let me know if you need anything else."
     sql_chain = get_sql_chain(db)  # sql chain for other queries
     template = """
        Based on the table schema below, question, SQL query, and SQL response, write only a natural language response to the user's question.

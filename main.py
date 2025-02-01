@@ -3,7 +3,7 @@ from secret_key import sec_key
 import streamlit as st
 from langchain_community.utilities import SQLDatabase
 from langchain_core.messages import AIMessage, HumanMessage
-from functions import get_response
+from functions.logic import get_response
 
 os.environ['GROQ_API_KEY'] = sec_key  # set environment variable
 

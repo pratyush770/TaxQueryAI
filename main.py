@@ -45,6 +45,7 @@ if user_query and user_query.strip():  # process user query
     st.session_state.chat_history.append(HumanMessage(content=user_query))
     with st.chat_message("Human"):
         st.markdown(user_query)
+
     # Edge cases
     # handle polite messages like "thanks" before processing further
     polite_messages = ["thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx", "okay thank you"]
@@ -78,7 +79,8 @@ if user_query and user_query.strip():  # process user query
         - What was the collection gap for Solapur from 2013-18 residential?  
         - What will be the tax demand for the year 2025 in Pune for residential?  
         """
-    # Normal logic
+
+    # Normal case
     else:
         city, property_type, year = extract_query_info(user_query)  # extract query info
         df = None  # load the dataset
@@ -90,6 +92,7 @@ if user_query and user_query.strip():  # process user query
             response = get_response(user_query, st.session_state.db, st.session_state.chat_history, city, property_type, year, df)
         else:
             response = "Sorry, I couldn't find data for that city. Please check your input."
+
     if response:  # append AI response and display it
         st.session_state.chat_history.append(AIMessage(content=response))
         with st.chat_message("AI"):

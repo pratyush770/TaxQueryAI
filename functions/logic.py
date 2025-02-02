@@ -4,8 +4,7 @@ from langchain_community.utilities import SQLDatabase
 from langchain_core.output_parsers import StrOutputParser  # for parsing the output into a string
 from langchain_core.runnables import RunnablePassthrough  # allows the function to pass as a runnable
 from langchain_groq import ChatGroq
-from sklearn.linear_model import LinearRegression
-import numpy as np
+from functions.prediction import train_prediction_model
 from langchain_core.prompts import ChatPromptTemplate
 
 model_name = "llama-3.1-8b-instant"  # name of model used
@@ -23,42 +22,6 @@ def get_schema(db: SQLDatabase):
     if SCHEMA_CACHE is None:
         SCHEMA_CACHE = db.get_table_info()
     return SCHEMA_CACHE
-
-
-def train_prediction_model(df, property_type):
-    tax_sums = {
-        "collection": df[[f'Tax_Collection_Cr_2013_14_{property_type}',
-                          f'Tax_Collection_Cr_2014_15_{property_type}',
-                          f'Tax_Collection_Cr_2015_16_{property_type}',
-                          f'Tax_Collection_Cr_2016_17_{property_type}',
-                          f'Tax_Collection_Cr_2017_18_{property_type}']].sum(axis=0),
-
-        "demand": df[[f'Tax_Demand_Cr_2013_14_{property_type}',
-                      f'Tax_Demand_Cr_2014_15_{property_type}',
-                      f'Tax_Demand_Cr_2015_16_{property_type}',
-                      f'Tax_Demand_Cr_2016_17_{property_type}',
-                      f'Tax_Demand_Cr_2017_18_{property_type}']].sum(axis=0)
-    }
-
-    X = np.array([2014, 2015, 2016, 2017, 2018]).reshape(-1, 1)
-    models = {}
-    predictions = {}
-
-    for key in ["collection", "demand"]:
-        y = tax_sums[key].values
-        model = LinearRegression()
-        model.fit(X, y)
-        models[key] = model
-
-    def predict_tax(year):
-        if year >= 2019:
-            return {
-                "predicted_collection": round(models["collection"].predict([[year]])[0], 2),
-                "predicted_demand": round(models["demand"].predict([[year]])[0], 2)
-            }
-        return None
-
-    return predict_tax
 
 
 def get_sql_chain(db: SQLDatabase):  # function to get sql query
@@ -141,9 +104,39 @@ def get_sql_response(user_query: str, db: SQLDatabase, chat_history: list):
     })
 
 
+def collection_gap(city, year, property_type, df):  # for predicting collection gap
+    predict_tax = train_prediction_model(df, property_type)  # train the prediction model for the given property type
+    tax_demand = predict_tax(year)["predicted_demand"]  # get the prediction for tax demand
+    tax_collection = predict_tax(year)["predicted_collection"]  # get the prediction for tax collection
+    collection_gap = round((tax_demand - tax_collection), 2)  # calculate the collection gap
+    return collection_gap
+
+
+def property_efficiency(city, year, property_type, df):  # for predicting property efficiency
+    predict_tax = train_prediction_model(df, property_type)  # train the prediction model for the given property type
+    tax_demand = predict_tax(year)["predicted_demand"]  # get the prediction for tax demand
+    tax_collection = predict_tax(year)["predicted_collection"]  # get the prediction for tax collection
+    property_efficiency = round(((tax_collection / tax_demand) * 100), 2)  # calculate the property efficiency
+    return property_efficiency
+
+
 def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str, property_type: str, year: int,
                  df: pd.DataFrame):
-    # first check if the query is a predictive query
+    # check if the query is related to collection gap
+    if "collection gap" in user_query.lower():
+        if year > 2018:
+            gap = collection_gap(city, year, property_type, df)
+            return f"The predicted collection gap for {city} {property_type} in {year} is {gap} Cr"
+        else:
+            return get_sql_response(user_query, db, chat_history)  # process the normal SQL query
+    # check if the query is related to property efficiency
+    if "property efficiency" in user_query.lower():
+        if year > 2018:
+                efficiency = property_efficiency(city, year, property_type, df)
+                return f"The predicted property efficiency for {city} {property_type} in {year} is {efficiency}%"
+        else:
+            return get_sql_response(user_query, db, chat_history)  # process the normal SQL query
+    # check if the query is a predictive query
     prediction_response = get_prediction_response(user_query, city, property_type, year, df)
     if prediction_response:
         return prediction_response  # return prediction if available
@@ -162,6 +155,14 @@ if __name__ == "__main__":  # example usage
     year = 2019
     response = get_response(user_query, db, chat_history, city, property_type, year, df)
     print(response)
+    # For prediction (collection gap)
+    user_query = "What will be the property efficiency for the year 2019 in Pune?"
+    chat_history = []
+    city = "Pune"
+    property_type = "Residential"
+    year = 2019
+    response = get_response(user_query, db, chat_history, city, property_type, year, df)
+    print(response)
     # For normal response
     user_query = "What was the total property tax collection in 2013-14 residential for aundh in pune city?"
     chat_history = []
@@ -170,3 +171,4 @@ if __name__ == "__main__":  # example usage
     year = 2014
     response = get_response(user_query, db, chat_history, city, property_type, year, df)
     print(response)
+

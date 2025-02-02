@@ -5,6 +5,7 @@ import pandas as pd
 from langchain_community.utilities import SQLDatabase
 from langchain_core.messages import AIMessage, HumanMessage
 from functions.logic import get_response, get_sql_chain
+import re
 
 os.environ['GROQ_API_KEY'] = sec_key  # set environment variable
 
@@ -34,11 +35,9 @@ def extract_query_info(user_query):  # function to extract city, property type, 
     property_types = ["Residential", "Commercial"]
     city = next((c for c in cities if c.lower() in user_query.lower()), None)
     property_type = next((p for p in property_types if p.lower() in user_query.lower()), None)
-    year = None
-    for word in user_query.split():
-        if word.isdigit() and 2013 <= int(word) <= 2050:
-            year = int(word)
-            break
+    # use regular expression to find a year between 2013 and 2050
+    year_match = re.search(r'\b(201[3-9]|20[2-4][0-9]|2050)\b', user_query)
+    year = int(year_match.group()) if year_match else None
     return city, property_type, year
 
 

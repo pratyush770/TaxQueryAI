@@ -156,7 +156,7 @@ if __name__ == "__main__":  # example usage
     response = get_response(user_query, db, chat_history, city, property_type, year, df)
     print(response)
     # For prediction (collection gap)
-    user_query = "What will be the property efficiency for the year 2019 in Pune?"
+    user_query = "What will be the property efficiency (residential) for the year 2019 in Pune?"
     chat_history = []
     city = "Pune"
     property_type = "Residential"

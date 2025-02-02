@@ -78,6 +78,7 @@ if user_query and user_query.strip():  # process user query
         - What was the collection gap for the year 2016-17 residential for Thanjavur? 
         - What was the collection gap for Solapur from 2013-18 residential?  
         - What will be the tax demand for the year 2025 in Pune for residential?  
+        - What will be the property efficiency (residential) for the year 2019 in Pune?
         """
 
     # Normal case

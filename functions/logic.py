@@ -99,7 +99,7 @@ def get_sql_chain(db: SQLDatabase):  # function to get sql query
 
 def get_prediction_response(user_query: str, city: str, property_type: str, year: int, df: pd.DataFrame):
     predict_tax = train_prediction_model(df, property_type)  # train the model for the given property type
-    prediction = predict_tax(year) if year >= 2019 else None  # get the prediction for the year
+    prediction = predict_tax(year) if year is not None and year >= 2019 else None  # get the prediction for the year
     # if prediction is available, return only the relevant prediction based on user query
     if prediction:
         if "demand" in user_query.lower():
@@ -112,10 +112,6 @@ def get_prediction_response(user_query: str, city: str, property_type: str, year
 
 
 def get_sql_response(user_query: str, db: SQLDatabase, chat_history: list):
-    # check if the user is expressing gratitude
-    gratitude_keywords = ["thanks", "thank you", "thx", "appreciate", "grateful"]
-    if any(word in user_query.lower() for word in gratitude_keywords):
-        return "You're welcome! Let me know if you need anything else."
     sql_chain = get_sql_chain(db)  # sql chain for other queries
     template = """
        Based on the table schema below, question, SQL query, and SQL response, write only a natural language response to the user's question.

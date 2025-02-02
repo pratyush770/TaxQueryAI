@@ -46,8 +46,9 @@ if user_query and user_query.strip():  # process user query
     st.session_state.chat_history.append(HumanMessage(content=user_query))
     with st.chat_message("Human"):
         st.markdown(user_query)
+    # Edge cases
     # handle polite messages like "thanks" before processing further
-    polite_messages = ["thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx"]
+    polite_messages = ["thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx", "okay thank you"]
     if user_query.lower().strip() in polite_messages:
         response = "You're welcome! Let me know if you have any more questions."
     elif any(phrase in user_query.lower() for phrase in ["give me the sql query", "give me the query"]):  # for getting sql query if asked by user
@@ -64,6 +65,21 @@ if user_query and user_query.strip():  # process user query
         "what are the name of the tables in the database?",
         "what are the cities in the database?"]):  # handle all variations of city or table queries
         response = "The name of the available cities in the database are pune, solapur, chennai, erode, jabalpur, thanjavur, and tiruchirappalli."
+    elif any(keyword in user_query.lower() for keyword in [  # if asked for possible questions by user
+        "what are the possible questions i can ask?",
+        "what are the possible questions i can ask to the database?",
+        "what type of questions can i ask?",
+        "what type of questions can i ask to the database"
+        "what questions can i ask to the database?"]):  # handle all variations
+        response = """
+        The possible questions you can ask are:
+        - What was the total property tax collection in 2013-14 residential for Aundh in Pune city?  
+        - What was the property efficiency for the year 2015-16 commercial for Chennai? 
+        - What was the collection gap for the year 2016-17 residential for Thanjavur? 
+        - What was the collection gap for Solapur from 2013-18 residential?  
+        - What will be the tax demand for the year 2025 in Pune for residential?  
+        """
+    # Normal logic
     else:
         city, property_type, year = extract_query_info(user_query)  # extract query info
         df = None  # load the dataset

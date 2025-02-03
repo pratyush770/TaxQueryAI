@@ -40,6 +40,7 @@ def extract_query_info(user_query):  # function to extract city, property type, 
     year = int(year_match.group()) if year_match else None
     return city, property_type, year
 
+
 # edge case handling
 def handle_edge_cases(user_query):
     polite_messages = ["thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx", "okay thank you"]

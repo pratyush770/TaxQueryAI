@@ -84,7 +84,7 @@ def get_sql_response(user_query: str, db: SQLDatabase, chat_history: list):
        Question: {question}
        SQL Query: {query}
        SQL Response: {response}
-       Natural Language Response:
+       Natural Language Response: (check if response is related to a property efficiency, if not, append " crore" at the end):
     """
     prompt = ChatPromptTemplate.from_template(template)  # another template to get the natural language response
 

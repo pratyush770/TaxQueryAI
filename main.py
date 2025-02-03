@@ -69,7 +69,7 @@ if user_query and user_query.strip():  # process user query
         "what are the possible questions i can ask?",
         "what are the possible questions i can ask to the database?",
         "what type of questions can i ask?",
-        "what type of questions can i ask to the database"
+        "what type of questions can i ask to the database?"
         "what questions can i ask to the database?"]):  # handle all variations
         response = """
         The possible questions you can ask are:

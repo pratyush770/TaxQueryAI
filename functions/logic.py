@@ -15,6 +15,11 @@ llm = ChatGroq(
 )
 
 SCHEMA_CACHE = None  # global schema cache
+MAX_HISTORY_LENGTH = 5  # keep last 5 queries and responses
+
+
+def trim_chat_history(chat_history):
+    return chat_history[-MAX_HISTORY_LENGTH:]
 
 
 def get_schema(db: SQLDatabase):
@@ -124,6 +129,7 @@ def property_efficiency(city, year, property_type, df):  # for predicting proper
 
 def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str, property_type: str, year: int,
                  df: pd.DataFrame):
+    chat_history = trim_chat_history(chat_history)  # trim chat history
     # check if the query is related to collection gap
     if "collection gap" in user_query.lower():
         if year > 2018:

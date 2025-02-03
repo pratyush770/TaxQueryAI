@@ -27,8 +27,8 @@ st.title("MySQL Database Q&A Tool")
 for message in st.session_state.chat_history:  # display chat history
     with st.chat_message("AI" if isinstance(message, AIMessage) else "Human"):
         st.markdown(message.content)
-user_query = st.chat_input("Type a message...")  # asks for user input
 
+user_query = st.chat_input("Type a message...")  # asks for user input
 
 def extract_query_info(user_query):  # function to extract city, property type, and year
     cities = ['Pune', 'Solapur', 'Erode', 'Jabalpur', 'Thanjavur', 'Chennai', 'Tiruchirappalli']
@@ -40,39 +40,36 @@ def extract_query_info(user_query):  # function to extract city, property type, 
     year = int(year_match.group()) if year_match else None
     return city, property_type, year
 
-
-if user_query and user_query.strip():  # process user query
-    st.session_state.chat_history.append(HumanMessage(content=user_query))
-    with st.chat_message("Human"):
-        st.markdown(user_query)
-
-    # Edge cases
-    # handle polite messages like "thanks" before processing further
+# edge case handling
+def handle_edge_cases(user_query):
     polite_messages = ["thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx", "okay thank you"]
     if user_query.lower().strip() in polite_messages:
-        response = "You're welcome! Let me know if you have any more questions."
+        return "You're welcome! Let me know if you have any more questions."
+    
     elif any(phrase in user_query.lower() for phrase in ["give me the sql query", "give me the query"]):  # for getting sql query if asked by user
         last_query = next(
             (msg.content for msg in reversed(st.session_state.chat_history) if isinstance(msg, HumanMessage)), None)
         if last_query:
             sql_chain = get_sql_chain(st.session_state.db)
-            response = sql_chain.invoke({"question": last_query, "chat_history": st.session_state.chat_history})
+            return sql_chain.invoke({"question": last_query, "chat_history": st.session_state.chat_history})
         else:
-            response = "I couldn't find a previous query to generate SQL for."
+            return "I couldn't find a previous query to generate SQL for."
+    
     elif any(keyword in user_query.lower() for keyword in [  # if asked for table names by user
         "what are the names of the available cities in the database?",
         "what are the available cities in the database?",
         "what are the names of the cities in the database?",
         "what are the names of the tables in the database?",
         "what are the cities in the database?"]):  # handle all variations of city or table queries
-        response = "The name of the available cities in the database are pune, solapur, chennai, erode, jabalpur, thanjavur, and tiruchirappalli."
+        return "The name of the available cities in the database are pune, solapur, chennai, erode, jabalpur, thanjavur, and tiruchirappalli."
+    
     elif any(keyword in user_query.lower() for keyword in [  # if asked for possible questions by user
         "what are the possible questions i can ask?",
         "what are the possible questions i can ask to the database?",
         "what type of questions can i ask?",
-        "what type of questions can i ask to the database?"
+        "what type of questions can i ask to the database?",
         "what questions can i ask to the database?"]):  # handle all variations
-        response = """
+        return """
         The possible questions you can ask are:
         - What was the total property tax collection in 2013-14 residential for Aundh in Pune city?  
         - What was the property efficiency for the year 2015-16 commercial for Chennai? 
@@ -81,9 +78,16 @@ if user_query and user_query.strip():  # process user query
         - What will be the tax demand for the year 2025 in Pune for residential?  
         - What will be the property efficiency (residential) for the year 2019 in Pune?
         """
+    return None
 
-    # Normal case
-    else:
+
+if user_query and user_query.strip():  # process user query
+    st.session_state.chat_history.append(HumanMessage(content=user_query))
+    with st.chat_message("Human"):
+        st.markdown(user_query)
+    response = handle_edge_cases(user_query)   # check for edge cases
+    
+    if not response:
         city, property_type, year = extract_query_info(user_query)  # extract query info
         df = None  # load the dataset
         if city:
@@ -99,4 +103,3 @@ if user_query and user_query.strip():  # process user query
         st.session_state.chat_history.append(AIMessage(content=response))
         with st.chat_message("AI"):
             st.markdown(response)
-

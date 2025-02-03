@@ -130,25 +130,20 @@ def property_efficiency(city, year, property_type, df):  # for predicting proper
 def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str, property_type: str, year: int,
                  df: pd.DataFrame):
     chat_history = trim_chat_history(chat_history)  # trim chat history
-    # check if the query is related to collection gap
-    if "collection gap" in user_query.lower():
-        if year > 2018:
-            gap = collection_gap(city, year, property_type, df)
-            return f"The predicted collection gap for {city} {property_type} in {year} is {gap} Cr"
-        else:
-            return get_sql_response(user_query, db, chat_history)  # process the normal SQL query
-    # check if the query is related to property efficiency
-    if "property efficiency" in user_query.lower():
-        if year > 2018:
-                efficiency = property_efficiency(city, year, property_type, df)
-                return f"The predicted property efficiency for {city} {property_type} in {year} is {efficiency}%"
-        else:
-            return get_sql_response(user_query, db, chat_history)  # process the normal SQL query
-    # check if the query is a predictive query
+    # check for a prediction-based response
     prediction_response = get_prediction_response(user_query, city, property_type, year, df)
     if prediction_response:
-        return prediction_response  # return prediction if available
-    return get_sql_response(user_query, db, chat_history)   # process the normal SQL query
+        return prediction_response  # if we have a prediction, return it immediately
+    # handle collection gap queries
+    if "collection gap" in user_query.lower() and year > 2018:
+        gap = collection_gap(city, year, property_type, df)
+        return f"The predicted collection gap for {city} {property_type} in {year} is {gap} Cr"
+    # handle property efficiency queries
+    if "property efficiency" in user_query.lower() and year > 2018:
+        efficiency = property_efficiency(city, year, property_type, df)
+        return f"The predicted property efficiency for {city} {property_type} in {year} is {efficiency}%"
+    # if no predictions applied, execute a normal SQL query
+    return get_sql_response(user_query, db, chat_history)
 
 
 if __name__ == "__main__":  # example usage

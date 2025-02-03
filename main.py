@@ -30,6 +30,7 @@ for message in st.session_state.chat_history:  # display chat history
 
 user_query = st.chat_input("Type a message...")  # asks for user input
 
+
 def extract_query_info(user_query):  # function to extract city, property type, and year
     cities = ['Pune', 'Solapur', 'Erode', 'Jabalpur', 'Thanjavur', 'Chennai', 'Tiruchirappalli']
     property_types = ["Residential", "Commercial"]
@@ -44,9 +45,13 @@ def extract_query_info(user_query):  # function to extract city, property type, 
 # edge case handling
 def handle_edge_cases(user_query):
     polite_messages = ["thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx", "okay thank you"]
-    if user_query.lower().strip() in polite_messages:
+    welcome_messages = ["hi", "hello", "how are you?", "hey", "hey there"]
+    if user_query.lower().strip() in welcome_messages:  # for welcome messages
+        return "Hey! How's it going?"
+
+    elif user_query.lower().strip() in polite_messages:  # for polite messages
         return "You're welcome! Let me know if you have any more questions."
-    
+
     elif any(phrase in user_query.lower() for phrase in ["give me the sql query", "give me the query"]):  # for getting sql query if asked by user
         last_query = next(
             (msg.content for msg in reversed(st.session_state.chat_history) if isinstance(msg, HumanMessage)), None)
@@ -55,7 +60,7 @@ def handle_edge_cases(user_query):
             return sql_chain.invoke({"question": last_query, "chat_history": st.session_state.chat_history})
         else:
             return "I couldn't find a previous query to generate SQL for."
-    
+
     elif any(keyword in user_query.lower() for keyword in [  # if asked for table names by user
         "what are the names of the available cities in the database?",
         "what are the available cities in the database?",
@@ -63,7 +68,7 @@ def handle_edge_cases(user_query):
         "what are the names of the tables in the database?",
         "what are the cities in the database?"]):  # handle all variations of city or table queries
         return "The name of the available cities in the database are pune, solapur, chennai, erode, jabalpur, thanjavur, and tiruchirappalli."
-    
+
     elif any(keyword in user_query.lower() for keyword in [  # if asked for possible questions by user
         "what are the possible questions i can ask?",
         "what are the possible questions i can ask to the database?",

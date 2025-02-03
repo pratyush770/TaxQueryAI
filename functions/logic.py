@@ -32,6 +32,8 @@ def get_sql_chain(db: SQLDatabase):  # function to get sql query
         Conversation History: {chat_history}
 
         For example: 
+        Question: "How many wards are there in the pune table?"
+        SQL Query: SELECT COUNT(Ward_Name) AS ward_count FROM pune;
         Question: What was the total property tax collection in 2013-14 residential for aundh in pune city?
         SQL Query: SELECT SUM(Tax_Collection_Cr_2013_14_Residential) AS total_tax_collected FROM pune WHERE Ward_Name = "Aundh";
         Question: What was the property efficiency for the year 2015-16 commercial for Chennai?
@@ -84,7 +86,7 @@ def get_sql_response(user_query: str, db: SQLDatabase, chat_history: list):
        Question: {question}
        SQL Query: {query}
        SQL Response: {response}
-       Natural Language Response: (check if response is related to a property efficiency, if not, append " crore" at the end):
+       Natural Language Response (check if response is related to a property efficiency or counting entries, if neither, append " crore" at the end):
     """
     prompt = ChatPromptTemplate.from_template(template)  # another template to get the natural language response
 

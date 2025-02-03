@@ -34,7 +34,7 @@ def extract_query_info(user_query):  # function to extract city, property type, 
     cities = ['Pune', 'Solapur', 'Erode', 'Jabalpur', 'Thanjavur', 'Chennai', 'Tiruchirappalli']
     property_types = ["Residential", "Commercial"]
     city = next((c for c in cities if c.lower() in user_query.lower()), None)
-    property_type = next((p for p in property_types if p.lower() in user_query.lower()), None)
+    property_type = next((p for p in property_types if p.lower() in user_query.lower()), "Residential")
     # use regular expression to find a year between 2013 and 2050
     year_match = re.search(r'\b(201[3-9]|20[2-4][0-9]|2050)\b', user_query)
     year = int(year_match.group()) if year_match else None
@@ -60,9 +60,10 @@ if user_query and user_query.strip():  # process user query
         else:
             response = "I couldn't find a previous query to generate SQL for."
     elif any(keyword in user_query.lower() for keyword in [  # if asked for table names by user
-        "what are the name of the available cities in the database?",
-        "what are the name of the cities in the database?",
-        "what are the name of the tables in the database?",
+        "what are the names of the available cities in the database?",
+        "what are the available cities in the database?",
+        "what are the names of the cities in the database?",
+        "what are the names of the tables in the database?",
         "what are the cities in the database?"]):  # handle all variations of city or table queries
         response = "The name of the available cities in the database are pune, solapur, chennai, erode, jabalpur, thanjavur, and tiruchirappalli."
     elif any(keyword in user_query.lower() for keyword in [  # if asked for possible questions by user
@@ -92,7 +93,7 @@ if user_query and user_query.strip():  # process user query
         if df is not None:  # generate response
             response = get_response(user_query, st.session_state.db, st.session_state.chat_history, city, property_type, year, df)
         else:
-            response = "Sorry, I couldn't find data for that city. Please check your input."
+            response = "Sorry, I couldn't find anything related to that. Please check your input."
 
     if response:  # append AI response and display it
         st.session_state.chat_history.append(AIMessage(content=response))

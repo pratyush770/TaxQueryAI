@@ -61,27 +61,20 @@ def handle_edge_cases(user_query):
         else:
             return "I couldn't find a previous query to generate SQL for."
 
-    elif any(keyword in user_query.lower() for keyword in [  # if asked for table names by user
-        "what are the names of the available cities in the database?",
-        "what are the available cities in the database?",
-        "what are the names of the cities in the database?",
-        "what are the names of the tables in the database?",
-        "what are the cities in the database?"]):  # handle all variations of city or table queries
-        return "The name of the available cities in the database are pune, solapur, chennai, erode, jabalpur, thanjavur, and tiruchirappalli."
+    city_keywords = {"cities", "tables", "database", "available", "names"}    # for city/table-related queries
+    if any(word in user_query for word in city_keywords):
+        return "The available cities in the database are Pune, Solapur, Chennai, Erode, Jabalpur, Thanjavur, and Tiruchirappalli."
 
-    elif any(keyword in user_query.lower() for keyword in [  # if asked for possible questions by user
-        "what are the possible questions i can ask?",
-        "what are the possible questions i can ask to the database?",
-        "what type of questions can i ask?",
-        "what type of questions can i ask to the database?",
-        "what questions can i ask to the database?"]):  # handle all variations
+    question_keywords = {"possible", "questions", "ask", "database", "type"}      # for possible question-related queries
+    if any(word in user_query for word in question_keywords):
         return """
         The possible questions you can ask are:
-        - What was the total property tax collection in 2013-14 residential for Aundh in Pune city?  
-        - What was the property efficiency for the year 2015-16 commercial for Chennai? 
-        - What was the collection gap for the year 2016-17 residential for Thanjavur? 
-        - What was the collection gap for Solapur from 2013-18 residential?  
-        - What will be the tax demand for the year 2025 in Pune for residential?  
+        - What was the total property tax collection in 2013-14 residential for Aundh in Pune city?
+        
+        - What was the property efficiency for the year 2015-16 commercial for Chennai?
+        - What was the collection gap for the year 2016-17 residential for Thanjavur?
+        - What was the collection gap for Solapur from 2013-18 residential?
+        - What will be the tax demand for the year 2025 in Pune for residential?
         - What will be the property efficiency (residential) for the year 2019 in Pune?
         """
     return None

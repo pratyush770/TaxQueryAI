@@ -42,7 +42,6 @@ def extract_query_info(user_query):  # function to extract city, property type, 
     return city, property_type, year
 
 
-# edge case handling
 def handle_edge_cases(user_query):  # function to handle edge cases
     user_query = user_query.strip().lower()
 
@@ -54,10 +53,8 @@ def handle_edge_cases(user_query):  # function to handle edge cases
 
     if user_query in welcome_messages:
         return "Hey! How's it going?"
-
     if user_query in polite_messages:
         return "You're welcome! Let me know if you have any more questions."
-
     if any(kw in user_query for kw in query_keywords):
         last_query = next(
             (msg.content for msg in reversed(st.session_state.chat_history) if isinstance(msg, HumanMessage)), None
@@ -66,10 +63,8 @@ def handle_edge_cases(user_query):  # function to handle edge cases
             sql_chain = get_sql_chain(st.session_state.db)
             return sql_chain.invoke({"question": last_query, "chat_history": st.session_state.chat_history})
         return "I couldn't find a previous query to generate SQL for."
-
     if any(word in user_query for word in city_keywords):
         return "The available cities in the database are Pune, Solapur, Chennai, Erode, Jabalpur, Thanjavur, and Tiruchirappalli."
-
     if any(word in user_query for word in question_keywords):
         return """
         The possible questions you can ask are:

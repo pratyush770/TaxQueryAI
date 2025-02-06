@@ -9,9 +9,10 @@ import re
 
 os.environ['GROQ_API_KEY'] = sec_key  # set environment variable
 
-if "db" not in st.session_state:  # initialize database connection
-    mysql_uri = mysql_uri
-    st.session_state.db = SQLDatabase.from_uri(mysql_uri)
+@st.cache_resource
+def get_db_connection():  # initialize connection once
+    return SQLDatabase.from_uri(mysql_uri)
+st.session_state.db = get_db_connection()
 
 if "chat_history" not in st.session_state:  # initialize chat history
     st.session_state.chat_history = [

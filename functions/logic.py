@@ -1,4 +1,4 @@
-from secret_key import sec_key
+from secret_key import sec_key, mysql_uri_local
 import pandas as pd
 from langchain_community.utilities import SQLDatabase
 from langchain_core.output_parsers import StrOutputParser  # for parsing the output into a string
@@ -37,7 +37,7 @@ def get_sql_chain(db: SQLDatabase):  # function to get sql query
         Conversation History: {chat_history}
 
         For example: 
-        Question: "How many wards are there in the pune table?"
+        Question: "How many rows are there in the pune table?"
         SQL Query: SELECT COUNT(Ward_Name) AS ward_count FROM pune;
         Question: What was the total property tax collection in 2013-14 residential for aundh in pune city?
         SQL Query: SELECT SUM(Tax_Collection_Cr_2013_14_Residential) AS total_tax_collected FROM pune WHERE Ward_Name = "Aundh";
@@ -72,7 +72,10 @@ def get_prediction_response(user_query: str, city: str, property_type: str, year
     prediction = predict_tax(year) if year is not None and year >= 2019 else None  # get the prediction for the year
     # if prediction is available, return only the relevant prediction based on user query
     if prediction:
-        if "demand" in user_query.lower():
+        if "efficiency" in user_query.lower():  # check for property efficiency query
+            efficiency = round((prediction['predicted_collection'] / prediction['predicted_demand']) * 100, 2)
+            return f"The predicted property efficiency for {city} {property_type} in {year} is {efficiency}%"
+        elif "demand" in user_query.lower():
             return f"The predicted tax demand for {city} {property_type} in {year} is {prediction['predicted_demand']} Cr"
         elif "collection" in user_query.lower():
             return f"The predicted tax collection for {city} {property_type} in {year} is {prediction['predicted_collection']} Cr"
@@ -147,7 +150,7 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str
 
 
 if __name__ == "__main__":  # example usage
-    mysql_uri = "mysql+mysqlconnector://root_readonly:matsumoto@localhost:3307/property_tax"
+    mysql_uri = mysql_uri_local  # taking local db
     db = SQLDatabase.from_uri(mysql_uri)
     df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Pune.csv")  # load the tax data as an example
     # For prediction

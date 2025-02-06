@@ -1,5 +1,5 @@
 import os
-from secret_key import sec_key
+from secret_key import sec_key, mysql_uri
 import streamlit as st
 import pandas as pd
 from langchain_community.utilities import SQLDatabase
@@ -10,7 +10,7 @@ import re
 os.environ['GROQ_API_KEY'] = sec_key  # set environment variable
 
 if "db" not in st.session_state:  # initialize database connection
-    mysql_uri = "mysql+mysqlconnector://root_readonly:matsumoto@localhost:3307/property_tax"
+    mysql_uri = mysql_uri
     st.session_state.db = SQLDatabase.from_uri(mysql_uri)
 
 if "chat_history" not in st.session_state:  # initialize chat history
@@ -43,29 +43,33 @@ def extract_query_info(user_query):  # function to extract city, property type, 
 
 
 # edge case handling
-def handle_edge_cases(user_query):
-    polite_messages = ["thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx", "okay thank you"]
-    welcome_messages = ["hi", "hello", "how are you?", "hey", "hey there"]
-    if user_query.lower().strip() in welcome_messages:  # for welcome messages
+def handle_edge_cases(user_query):  # function to handle edge cases
+    user_query = user_query.strip().lower()
+
+    welcome_messages = {"hi", "hello", "how are you?", "hey", "hey there"}
+    polite_messages = {"thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx", "okay thank you"}
+    query_keywords = {"give me sql", "provide sql", "show sql", "fetch sql", "generate sql", "sql query"}
+    city_keywords = {"cities", "tables", "database", "available", "names"}
+    question_keywords = {"possible", "questions", "ask", "database", "type"}
+
+    if user_query in welcome_messages:
         return "Hey! How's it going?"
 
-    elif user_query.lower().strip() in polite_messages:  # for polite messages
+    if user_query in polite_messages:
         return "You're welcome! Let me know if you have any more questions."
 
-    elif any(phrase in user_query.lower() for phrase in ["give me the sql query", "give me the query"]):  # for getting sql query if asked by user
+    if any(kw in user_query for kw in query_keywords):
         last_query = next(
-            (msg.content for msg in reversed(st.session_state.chat_history) if isinstance(msg, HumanMessage)), None)
+            (msg.content for msg in reversed(st.session_state.chat_history) if isinstance(msg, HumanMessage)), None
+        )
         if last_query:
             sql_chain = get_sql_chain(st.session_state.db)
             return sql_chain.invoke({"question": last_query, "chat_history": st.session_state.chat_history})
-        else:
-            return "I couldn't find a previous query to generate SQL for."
+        return "I couldn't find a previous query to generate SQL for."
 
-    city_keywords = {"cities", "tables", "database", "available", "names"}    # for city/table-related queries
     if any(word in user_query for word in city_keywords):
         return "The available cities in the database are Pune, Solapur, Chennai, Erode, Jabalpur, Thanjavur, and Tiruchirappalli."
 
-    question_keywords = {"possible", "questions", "ask", "database", "type"}      # for possible question-related queries
     if any(word in user_query for word in question_keywords):
         return """
         The possible questions you can ask are:
@@ -77,6 +81,7 @@ def handle_edge_cases(user_query):
         - What will be the tax demand for the year 2025 in Pune for residential?
         - What will be the property efficiency (residential) for the year 2019 in Pune?
         """
+
     return None
 
 
@@ -90,9 +95,8 @@ if user_query and user_query.strip():  # process user query
         city, property_type, year = extract_query_info(user_query)  # extract query info
         df = None  # load the dataset
         if city:
-            df_path = f"D:/TaxQueryAI/datasets/transformed_data/Property-Tax-{city}.csv"
-            if os.path.exists(df_path):
-                df = pd.read_csv(df_path)
+            df_path = f"https://raw.githubusercontent.com/pratyush770/TaxQueryAI/master/datasets/transformed_data/Property-Tax-{city}.csv"
+            df = pd.read_csv(df_path)  # load CSV from GitHub
         if df is not None:  # generate response
             response = get_response(user_query, st.session_state.db, st.session_state.chat_history, city, property_type, year, df)
         else:

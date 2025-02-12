@@ -9,20 +9,22 @@ import re
 
 os.environ['GROQ_API_KEY'] = sec_key  # set environment variable
 
+st.set_page_config(  # set page config
+    page_title="TaxQueryAI",
+    page_icon=":speech_balloon:"
+)
+
 @st.cache_resource
 def get_db_connection():  # initialize connection once
     return SQLDatabase.from_uri(mysql_uri)
 st.session_state.db = get_db_connection()
+
 
 if "chat_history" not in st.session_state:  # initialize chat history
     st.session_state.chat_history = [
         AIMessage(content="Hello, I'm a SQL assistant. Ask me anything about your database.")
     ]
 
-st.set_page_config(  # set page config
-    page_title="TaxQueryAI",
-    page_icon=":speech_balloon:"
-)
 st.title("MySQL Database Q&A Tool")
 
 for message in st.session_state.chat_history:  # display chat history

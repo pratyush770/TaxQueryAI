@@ -14,7 +14,7 @@ st.set_page_config(  # set page config
     page_icon=":speech_balloon:"
 )
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def get_db_connection():  # initialize connection once
     return SQLDatabase.from_uri(mysql_uri)
 st.session_state.db = get_db_connection()

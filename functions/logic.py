@@ -41,6 +41,8 @@ def get_sql_chain(db: SQLDatabase):  # function to get sql query
         SQL Query: SELECT COUNT(Ward_Name) AS ward_count FROM pune;
         Question: What was the total property tax collection in 2013-14 residential for aundh in pune city?
         SQL Query: SELECT SUM(Tax_Collection_Cr_2013_14_Residential) AS total_tax_collected FROM pune WHERE Ward_Name = "Aundh";
+        Question: What was the total tax demand in 2015-16 commercial for erode in zone 3?
+        SQL Query: SELECT SUM(Tax_Demand_Cr_2015_16_Commercial) AS total_tax_demand FROM erode WHERE Zone_Name = "Zone-3";
         Question: What was the property efficiency for the year 2015-16 commercial for Chennai?
         SQL Query: SELECT ROUND((SUM(Tax_Collection_Cr_2015_16_Commercial) / SUM(Tax_Demand_Cr_2015_16_Commercial)) * 100, 2) AS property_efficiency_percent FROM chennai;
         Question: What was the property efficiency for pune from 2013-18 commercial?

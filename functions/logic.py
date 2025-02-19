@@ -7,7 +7,7 @@ from langchain_groq import ChatGroq
 from functions.prediction import train_prediction_model
 from langchain_core.prompts import ChatPromptTemplate
 
-model_name = "llama-3.1-8b-instant"  # name of model used
+model_name = "qwen-2.5-32b"  # name of model used
 llm = ChatGroq(
     model_name=model_name,
     temperature=0.1,  # more accurate results
@@ -15,7 +15,7 @@ llm = ChatGroq(
 )
 
 SCHEMA_CACHE = None  # global schema cache
-MAX_HISTORY_LENGTH = 5  # keep last 5 queries and responses
+MAX_HISTORY_LENGTH = 3  # keep last 3 queries and responses
 
 
 def trim_chat_history(chat_history):

@@ -70,6 +70,10 @@ def get_prediction_response(value: str, city: str, property_type: str, year: int
 
 
 if predict_button:  # if clicked on button
+    st.write("")  # adds a blank space
+    st.write("")  # adds another blank space
+    st.write("")  # adds another blank space
+    st.write("")  # adds another blank space
     historical_years = list(range(2013, 2018))
     predictions = []  # empty list to store predictions
 
@@ -91,15 +95,15 @@ if predict_button:  # if clicked on button
     all_values = predictions + [selected_year_value]  # get all the predictions
     all_types = ["Historical" for _ in historical_years] + ["Predicted"]
 
-    chart_data = pd.DataFrame({"Year": all_years, "Value": all_values, "Type": all_types})  # convert to dataFrame for altair
+    chart_data = pd.DataFrame({"Year": all_years, "Value (Cr)": all_values, "Type": all_types})  # convert to dataFrame for altair
     chart = (  # create altair chart with different colors
         alt.Chart(chart_data)
         .mark_line(point=True)
         .encode(
             x="Year:O",  # discrete year values
-            y="Value:Q",
+            y="Value (Cr):Q",
             color="Type:N",  # different color for historical & predicted
-            tooltip=["Year", "Value", "Type"]
+            tooltip=["Year", "Value (Cr)", "Type"]
         )
         .properties(width=700, height=400)
     )

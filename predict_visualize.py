@@ -10,7 +10,8 @@ st.set_page_config(  # set page configuration
     page_icon=":speech_balloon:"
 )
 
-st.title("Predict Values")  # title of the page
+st.markdown(f"<h1 style='text-align: center; color: black;'>Predict Values</h1>", unsafe_allow_html=True)  # title of the page
+st.write("")  # adds a blank space
 col1, col2 = st.columns(2)  # divide into 2 columns
 col3, col4 = st.columns(2)
 
@@ -62,49 +63,48 @@ def get_prediction_response(value: str, city: str, property_type: str, year: int
     prediction = predict_tax(year)  # get the prediction
 
     if prediction:
+        tax_collection = prediction["predicted_collection"]
+        tax_demand = prediction["predicted_demand"]
         if value == "tax collection":  # for tax collection
-            return prediction["predicted_collection"]
+            return tax_collection
         elif value == "tax demand":  # for tax demand
-            return prediction["predicted_demand"]
+            return tax_demand
+        elif value == "property efficiency":  # for property efficiency
+            return round((tax_collection / tax_demand) * 100, 2) if tax_demand else 0  # avoid division by zero
+        elif value == "collection gap":  # for collection gap
+            return round(tax_demand - tax_collection, 2)
     return None
 
 
 if predict_button:  # if clicked on button
     st.write("")  # adds a blank space
     st.write("")  # adds another blank space
-    st.write("")  # adds another blank space
-    st.write("")  # adds another blank space
     historical_years = list(range(2013, 2018))
     predictions = []  # empty list to store predictions
 
-    if prediction in ["property efficiency", "collection gap"]:
-        for y in historical_years:
-            if prediction == "property efficiency":  # for property efficiency
-                predictions.append(property_efficiency(city, y, ptype, df))  # append the values in the list
-            else:  # for collection gap
-                predictions.append(collection_gap(city, y, ptype, df))
-
-        selected_year_value = property_efficiency(city, year, ptype, df) if prediction == "property efficiency" else collection_gap(city, year, ptype, df)
-    else:  # for tax demand or collection
-        for y in historical_years:
-            predictions.append(get_prediction_response(prediction, city, ptype, y, df))
-
-        selected_year_value = get_prediction_response(prediction, city, ptype, year, df)
+    for y in historical_years:  # for historical years
+        predictions.append(get_prediction_response(prediction, city, ptype, y, df))  # get predictions for historical years
+    selected_year_value = get_prediction_response(prediction, city, ptype, year, df)  # get prediction for selected year
 
     all_years = historical_years + [year]  # join all the years in a list
     all_values = predictions + [selected_year_value]  # get all the predictions
     all_types = ["Historical" for _ in historical_years] + ["Predicted"]
 
-    chart_data = pd.DataFrame({"Year": all_years, "Value (Cr)": all_values, "Type": all_types})  # convert to dataFrame for altair
+    chart_data = pd.DataFrame({"Year": all_years, "Value": all_values, "Type": all_types})  # convert to dataFrame for altair
     chart = (  # create altair chart with different colors
         alt.Chart(chart_data)
         .mark_line(point=True)
         .encode(
             x="Year:O",  # discrete year values
-            y="Value (Cr):Q",
+            y="Value:Q",
             color="Type:N",  # different color for historical & predicted
-            tooltip=["Year", "Value (Cr)", "Type"]
+            tooltip=["Year", "Value", "Type"]
         )
         .properties(width=700, height=400)
+        .configure_view(stroke="lightgray", strokeWidth=0.5)  # adds a black border around the chart
     )
-    st.altair_chart(chart, use_container_width=True)  # display the chart
+    unit = "%" if prediction == "collection gap" else "Cr"  # display unit at end of the title
+    title = f"Predicted {prediction.replace('_', ' ').title()} ({unit}) for {city} ({ptype}) in {year}"  # constructing the dynamic title
+    st.markdown(f"<h5 style='text-align: center; color: black;'>{title}</h4>", unsafe_allow_html=True)  # display the title
+    st.write("")  # adds a blank space
+    st.altair_chart(chart)  # display the chart

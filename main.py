@@ -4,8 +4,7 @@ import streamlit as st
 import pandas as pd
 from langchain_community.utilities import SQLDatabase
 from langchain_core.messages import AIMessage, HumanMessage
-from functions.logic import get_response, get_sql_chain
-import re
+from functions.logic import get_response, get_sql_chain, extract_query_info
 
 os.environ['GROQ_API_KEY'] = sec_key  # set environment variable
 
@@ -37,23 +36,12 @@ for message in st.session_state.chat_history:  # display chat history
 user_query = st.chat_input("Type a message...")  # asks for user input
 
 
-def extract_query_info(user_query):  # function to extract city, property type, and year
-    cities = ['Pune', 'Solapur', 'Erode', 'Jabalpur', 'Thanjavur', 'Chennai', 'Tiruchirappalli']
-    property_types = ["Residential", "Commercial"]
-    city = next((c for c in cities if c.lower() in user_query.lower()), None)
-    property_type = next((p for p in property_types if p.lower() in user_query.lower()), "Residential")
-    # use regular expression to find a year between 2013 and 2050
-    year_match = re.search(r'\b(201[3-9]|20[2-4][0-9]|2050)\b', user_query)
-    year = int(year_match.group()) if year_match else None
-    return city, property_type, year
-
-
 def handle_edge_cases(user_query):  # function to handle edge cases
     user_query = user_query.strip().lower()
 
     welcome_messages = {"hi", "hello", "how are you?", "hey", "hey there"}
     polite_messages = {"thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx", "okay thank you"}
-    query_keywords = {"give me sql", "provide sql", "show sql", "fetch sql", "generate sql", "sql query"}
+    query_keywords = {"give me sql", "provide sql", "show sql", "fetch sql", "generate sql", "sql query", "give me query", "give me the query"}
     city_keywords = {"cities", "tables", "database", "available", "names"}
     question_keywords = {"possible", "questions", "ask", "database", "type"}
 

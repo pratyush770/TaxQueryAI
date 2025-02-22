@@ -6,6 +6,7 @@ from langchain_core.runnables import RunnablePassthrough  # allows the function 
 from langchain_groq import ChatGroq
 from functions.prediction import train_prediction_model
 from langchain_core.prompts import ChatPromptTemplate
+import re
 
 model_name = "qwen-2.5-32b"  # name of model used
 llm = ChatGroq(
@@ -15,11 +16,6 @@ llm = ChatGroq(
 )
 
 SCHEMA_CACHE = None  # global schema cache
-MAX_HISTORY_LENGTH = 3  # keep last 3 queries and responses
-
-
-def trim_chat_history(chat_history):
-    return chat_history[-MAX_HISTORY_LENGTH:]
 
 
 def get_schema(db: SQLDatabase):
@@ -132,9 +128,19 @@ def property_efficiency(city, year, property_type, df):  # for predicting proper
     return property_efficiency
 
 
+def extract_query_info(user_query):  # function to extract city, property type, and year
+    cities = ['Pune', 'Solapur', 'Erode', 'Jabalpur', 'Thanjavur', 'Chennai', 'Tiruchirappalli']
+    property_types = ["Residential", "Commercial"]
+    city = next((c for c in cities if c.lower() in user_query.lower()), None)
+    property_type = next((p for p in property_types if p.lower() in user_query.lower()), "Residential")
+    # use regular expression to find a year between 2013 and 2050
+    year_match = re.search(r'\b(201[3-9]|20[2-4][0-9]|2050)\b', user_query)
+    year = int(year_match.group()) if year_match else None
+    return city, property_type, year
+
+
 def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str, property_type: str, year: int,
                  df: pd.DataFrame):
-    chat_history = trim_chat_history(chat_history)  # trim chat history
     # check for a prediction-based response
     prediction_response = get_prediction_response(user_query, city, property_type, year, df)
     if prediction_response:

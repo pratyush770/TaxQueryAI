@@ -1,5 +1,4 @@
 import streamlit as st
-from functions.logic import property_efficiency, collection_gap
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression

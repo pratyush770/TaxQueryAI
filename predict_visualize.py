@@ -103,7 +103,7 @@ if predict_button:  # if clicked on button
         .properties(width=700, height=400)
         .configure_view(stroke="lightgray", strokeWidth=0.5)  # adds a black border around the chart
     )
-    unit = "%" if prediction == "collection gap" else "Cr"  # display unit at end of the title
+    unit = "%" if prediction == "property efficiency" else "Cr"  # display unit at end of the title
     title = f"Predicted {prediction.replace('_', ' ').title()} ({unit}) for {city} ({ptype}) in {year}"  # constructing the dynamic title
     st.markdown(f"<h5 style='text-align: center; color: black;'>{title}</h4>", unsafe_allow_html=True)  # display the title
     st.write("")  # adds a blank space

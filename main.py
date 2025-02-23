@@ -34,6 +34,8 @@ for message in st.session_state.chat_history:  # display chat history
         st.markdown(message.content)
 
 user_query = st.chat_input("Type a message...")  # asks for user input
+if st.button("Predict and Visualize"):
+    st.switch_page("pages/predict_visualize.py")  # redirects to the page
 
 
 def handle_edge_cases(user_query):  # function to handle edge cases

@@ -130,15 +130,16 @@ def extract_query_info(user_query):  # function to extract city, property type, 
     return city, property_type, year
 
 
-def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history: list, sql_query: str, is_prediction: bool):
+def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history: list, is_prediction: bool):
+    sql_query = get_sql_chain(db).invoke({"question": user_query, "chat_history": chat_history})  # get SQL query
     if is_prediction:  # for future prediction
         template = """
             Based on the user's question and the predicted response, provide a structured breakdown of how the prediction was generated.
 
             **Question:** {question}  
-            **Response:** {response}  
+            **Response:** {response} 
 
-            **Breakdown:**  
+            **Breakdown:**      
             - Historical property tax data from 2013 to 2018 was gathered.  
             - A **Linear Regression** model was trained on this data to identify patterns.  
             - The trained model predicted the property tax value for the requested year.  
@@ -151,13 +152,12 @@ def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history
             Provide a structured breakdown of how the response was derived from the database.
 
             **Question:** {question}  
-            **Response:** {response}  
+            **Response:** {response}
 
             **Breakdown:**  
             - Step 1: Identify relevant tables and fields.  
             - Step 2: Apply necessary filters (e.g., city, property type, year).  
-            - Step 3: Generate the SQL query to fetch the required data.  
-                - **SQL Query:** {sql_query}  
+            - Step 3: {sql_query}  
             - Step 4: Compute values using the database records.  
             - Step 5: Format the response accordingly.  
 
@@ -167,18 +167,18 @@ def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history
     prompt = ChatPromptTemplate.from_template(template)
 
     chain = (
-        RunnablePassthrough.assign(
-            schema=lambda _: get_schema(db),  # get cached schema
-        )
-        | prompt
-        | llm
-        | StrOutputParser()
+            RunnablePassthrough.assign(
+                schema=lambda _: get_schema(db),  # get cached schema
+            )
+            | prompt
+            | llm
+            | StrOutputParser()
     )
 
     return chain.invoke({
         "question": user_query,
         "response": response,
-        "sql_query": sql_query
+        "sql_query": sql_query,
     })
 
 
@@ -204,20 +204,21 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str
 if __name__ == "__main__":
     mysql_uri = mysql_uri_local  # use local database
     db = SQLDatabase.from_uri(mysql_uri)
-    df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Chennai.csv")  # load tax data
+    df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Pune.csv")  # load tax data
 
     # example: normal query
-    user_query = "What was the property efficiency for the year 2015-16 commercial for Chennai?"
+    user_query = "What was the total tax demand in 2015-16 residential for Kothrud in Pune city?"
     chat_history = []
-    city = "Chennai"
-    property_type = "Commercial"
+    city = "Pune"
+    property_type = "Residential"
     year = 2015
-    response = get_response(user_query, db, chat_history, city, property_type, year, df)
+    sql_query = get_sql_chain(db).invoke({"question": user_query, "chat_history": chat_history})  # get sql query
+    print(sql_query)
+    response = get_response(user_query, db, chat_history, city, property_type, year, df)  # get natural language response
     print(response)
 
     # example: user requests breakdown
     user_query_breakdown = "Give me the breakdown"
     is_prediction = False
-    sql_query = "SELECT ROUND((SUM(Tax_Collection_Cr_2015_16_Commercial) / SUM(Tax_Demand_Cr_2015_16_Commercial)) * 100, 2) AS property_efficiency_percent FROM chennai;"
-    breakdown = give_breakdown(user_query, response, db, chat_history, sql_query, is_prediction)
+    breakdown = give_breakdown(user_query, response, db, chat_history, is_prediction)
     print(breakdown)

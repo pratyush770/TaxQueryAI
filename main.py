@@ -48,6 +48,7 @@ def handle_edge_cases(user_query):  # function to handle edge cases
     city_keywords = {"cities", "tables", "database", "available", "names"}
     question_keywords = {"possible", "questions", "ask", "database", "type"}
     breakdown_keywords = {"breakdown", "detailed explanation", "explanation", "brief"}
+    goodbye_messages = {"bye", "goodbye"}
 
     if user_query in welcome_messages:  # for welcome messages
         return "Hey! How's it going?"
@@ -62,7 +63,7 @@ def handle_edge_cases(user_query):  # function to handle edge cases
         )
         if last_query and last_response:
             if "predicted" in last_response.lower():
-                return "The last response was a machine learning prediction and hence no sql query was generated for it."
+                return "The previous response involved a Machine Learning prediction, thus no SQL query was generated."
             else:
                 sql_chain = get_sql_chain(st.session_state.db)
                 return sql_chain.invoke({"question": last_query, "chat_history": st.session_state.chat_history})
@@ -89,8 +90,9 @@ def handle_edge_cases(user_query):  # function to handle edge cases
         )
         if last_query and last_response:
             is_prediction = "predicted" in last_response.lower()  # check if response was a prediction
-            return give_breakdown(user_query, last_response, st.session_state.db, st.session_state.chat_history, last_query, is_prediction)
-
+            return give_breakdown(user_query, last_response, st.session_state.db, st.session_state.chat_history, is_prediction)
+    if user_query in goodbye_messages:  # for goodbye messages
+        return "Goodbye! Catch you later."
     return None
 
 

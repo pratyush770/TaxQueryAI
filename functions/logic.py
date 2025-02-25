@@ -28,8 +28,7 @@ def get_schema(db: SQLDatabase):
 
 def get_sql_chain(db: SQLDatabase):  # function to get sql query
     template = """
-        Based on the table schema below, write only a SQL query that would answer the user's question.
-        Don't provide any extra information other than the sql query.
+        Generate only an SQL query based on the schema:
         {schema}
         Conversation History: {chat_history}
 
@@ -54,10 +53,6 @@ def get_sql_chain(db: SQLDatabase):  # function to get sql query
         SQL Query:
     """
     prompt = ChatPromptTemplate.from_template(template)
-
-    def get_schema(_):  # function to get schema info
-        return db.get_table_info()
-
     return (
             RunnablePassthrough.assign(schema=lambda _: get_schema(db))  # use cached schema
             | prompt
@@ -86,7 +81,7 @@ def get_prediction_response(user_query: str, city: str, property_type: str, year
 def get_sql_response(user_query: str, db: SQLDatabase, chat_history: list):
     sql_chain = get_sql_chain(db)  # sql chain for other queries
     template = """
-       Based on the table schema below, question, SQL query, and SQL response, write only a natural language response to the user's question.
+       Convert the SQL response into a natural language response:
        {schema}
        Conversation History: {chat_history}
 
@@ -113,20 +108,15 @@ def get_sql_response(user_query: str, db: SQLDatabase, chat_history: list):
     })
 
 
-def collection_gap(city, year, property_type, df):  # for predicting collection gap
+def predict_metric(user_query, city, year, property_type, df):  # for predicting collection gap / property efficiency
     predict_tax = train_prediction_model(df, property_type)  # train the prediction model for the given property type
     tax_demand = predict_tax(year)["predicted_demand"]  # get the prediction for tax demand
     tax_collection = predict_tax(year)["predicted_collection"]  # get the prediction for tax collection
-    collection_gap = round((tax_demand - tax_collection), 2)  # calculate the collection gap
-    return collection_gap
-
-
-def property_efficiency(city, year, property_type, df):  # for predicting property efficiency
-    predict_tax = train_prediction_model(df, property_type)  # train the prediction model for the given property type
-    tax_demand = predict_tax(year)["predicted_demand"]  # get the prediction for tax demand
-    tax_collection = predict_tax(year)["predicted_collection"]  # get the prediction for tax collection
-    property_efficiency = round(((tax_collection / tax_demand) * 100), 2)  # calculate the property efficiency
-    return property_efficiency
+    if "collection gap" in user_query.lower():  # for collection gap
+        return round((tax_demand - tax_collection), 2)  # calculate the collection gap
+    elif "property_efficiency" in user_query.lower():  # for property efficiency
+        return round(((tax_collection / tax_demand) * 100), 2)  # calculate the property efficiency
+    return None
 
 
 def extract_query_info(user_query):  # function to extract city, property type, and year
@@ -140,7 +130,7 @@ def extract_query_info(user_query):  # function to extract city, property type, 
     return city, property_type, year
 
 
-def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history: list, is_prediction: bool):
+def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history: list, sql_query: str, is_prediction: bool):
     if is_prediction:  # for future prediction
         template = """
             Based on the user's question and the predicted response, provide a structured breakdown of how the prediction was generated.
@@ -166,8 +156,10 @@ def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history
             **Breakdown:**  
             - Step 1: Identify relevant tables and fields.  
             - Step 2: Apply necessary filters (e.g., city, property type, year).  
-            - Step 3: Compute values using the database records.  
-            - Step 4: Format the response accordingly.  
+            - Step 3: Generate the SQL query to fetch the required data.  
+                - **SQL Query:** {sql_query}  
+            - Step 4: Compute values using the database records.  
+            - Step 5: Format the response accordingly.  
 
             The explanation should be in past tense and concise.
         """
@@ -186,6 +178,7 @@ def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history
     return chain.invoke({
         "question": user_query,
         "response": response,
+        "sql_query": sql_query
     })
 
 
@@ -198,11 +191,11 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str
         return prediction_response  # if there's a prediction, return it immediately
     # handle collection gap queries
     if "collection gap" in user_query.lower() and year > 2018:
-        gap = collection_gap(city, year, property_type, df)
+        gap = predict_metric(user_query, city, year, property_type, df)
         return f"The predicted collection gap for {city} {property_type} in {year} is {gap} Cr"
     # handle property efficiency queries
     if "property efficiency" in user_query.lower() and year > 2018:
-        efficiency = property_efficiency(city, year, property_type, df)
+        efficiency = predict_metric(user_query, city, year, property_type, df)
         return f"The predicted property efficiency for {city} {property_type} in {year} is {efficiency}%"
     # if no predictions applied, execute a normal SQL query
     return get_sql_response(user_query, db, chat_history)
@@ -211,19 +204,20 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str
 if __name__ == "__main__":
     mysql_uri = mysql_uri_local  # use local database
     db = SQLDatabase.from_uri(mysql_uri)
-    df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Pune.csv")  # load tax data
+    df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Chennai.csv")  # load tax data
 
     # example: normal query
-    user_query = "What will be the property efficiency (residential) for the year 2019 in Pune?"
+    user_query = "What was the property efficiency for the year 2015-16 commercial for Chennai?"
     chat_history = []
-    city = "Pune"
-    property_type = "Residential"
-    year = 2019
+    city = "Chennai"
+    property_type = "Commercial"
+    year = 2015
     response = get_response(user_query, db, chat_history, city, property_type, year, df)
     print(response)
 
     # example: user requests breakdown
     user_query_breakdown = "Give me the breakdown"
-    is_prediction = True
-    breakdown = give_breakdown(user_query, response, db, chat_history, is_prediction)
+    is_prediction = False
+    sql_query = "SELECT ROUND((SUM(Tax_Collection_Cr_2015_16_Commercial) / SUM(Tax_Demand_Cr_2015_16_Commercial)) * 100, 2) AS property_efficiency_percent FROM chennai;"
+    breakdown = give_breakdown(user_query, response, db, chat_history, sql_query, is_prediction)
     print(breakdown)

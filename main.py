@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 from langchain_community.utilities import SQLDatabase
 from langchain_core.messages import AIMessage, HumanMessage
-from functions.logic import get_response, get_sql_chain, extract_query_info
+from functions.logic import get_response, get_sql_chain, extract_query_info, give_breakdown
 
 os.environ['GROQ_API_KEY'] = sec_key  # set environment variable
 
@@ -41,15 +41,16 @@ def handle_edge_cases(user_query):  # function to handle edge cases
 
     welcome_messages = {"hi", "hello", "how are you?", "hey", "hey there"}
     polite_messages = {"thanks", "thank you", "thx", "appreciate it", "ty", "okay thanks", "thnx", "okay thank you"}
-    query_keywords = {"give me sql", "provide sql", "show sql", "fetch sql", "generate sql", "sql query", "give me query", "give me the query"}
+    query_keywords = {"give me sql", "provide sql", "show sql", "fetch sql", "generate sql", "sql query", "give me query", "give me the query", "give me the sql query"}
     city_keywords = {"cities", "tables", "database", "available", "names"}
     question_keywords = {"possible", "questions", "ask", "database", "type"}
+    breakdown_keywords = {"breakdown", "detailed explanation", "explanation", "brief"}
 
-    if user_query in welcome_messages:
+    if user_query in welcome_messages:  # for welcome messages
         return "Hey! How's it going?"
-    if user_query in polite_messages:
+    if user_query in polite_messages:  # for polite messages
         return "You're welcome! Let me know if you have any more questions."
-    if any(kw in user_query for kw in query_keywords):
+    if any(kw in user_query for kw in query_keywords):  # for query keywords
         last_query = next(
             (msg.content for msg in reversed(st.session_state.chat_history) if isinstance(msg, HumanMessage)), None
         )
@@ -57,9 +58,9 @@ def handle_edge_cases(user_query):  # function to handle edge cases
             sql_chain = get_sql_chain(st.session_state.db)
             return sql_chain.invoke({"question": last_query, "chat_history": st.session_state.chat_history})
         return "I couldn't find a previous query to generate SQL for."
-    if any(word in user_query for word in city_keywords):
+    if any(word in user_query for word in city_keywords):  # for city keywords
         return "The available cities in the database are Pune, Solapur, Chennai, Erode, Jabalpur, Thanjavur, and Tiruchirappalli."
-    if any(word in user_query for word in question_keywords):
+    if any(word in user_query for word in question_keywords):  # for possible questions
         return """
         The possible questions you can ask are:
         - What was the total property tax collection in 2013-14 residential for Aundh in Pune city?
@@ -70,6 +71,17 @@ def handle_edge_cases(user_query):  # function to handle edge cases
         - What will be the tax demand for the year 2025 in Pune for residential?
         - What will be the property efficiency (residential) for the year 2019 in Pune?
         """
+    if any(word in user_query for word in breakdown_keywords):  # for breakdown queries
+        last_query = next(
+            (msg.content for msg in reversed(st.session_state.chat_history) if isinstance(msg, HumanMessage)), None
+        )
+        last_response = next(
+            (msg.content for msg in reversed(st.session_state.chat_history) if isinstance(msg, AIMessage)), None
+        )
+        if last_query and last_response:
+            is_prediction = "predicted" in last_response.lower()  # check if response was a prediction
+            return give_breakdown(last_query, last_response, st.session_state.db, st.session_state.chat_history,
+                                  is_prediction)
 
     return None
 

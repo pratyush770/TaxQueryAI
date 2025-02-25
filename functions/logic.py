@@ -16,6 +16,7 @@ llm = ChatGroq(
 )
 
 SCHEMA_CACHE = None  # global schema cache
+MAX_HISTORY = 3  # keep only the last 3 messages
 
 
 def get_schema(db: SQLDatabase):
@@ -94,7 +95,7 @@ def get_sql_response(user_query: str, db: SQLDatabase, chat_history: list):
        SQL Response: {response}
        Natural Language Response (check if response is related to a property efficiency or counting entries, if neither, append " crore" at the end):
     """
-    prompt = ChatPromptTemplate.from_template(template)  # another template to get the natural language response
+    prompt = ChatPromptTemplate.from_template(template)  # template to get the natural language response
 
     chain = (
             RunnablePassthrough.assign(query=sql_chain).assign(
@@ -139,12 +140,62 @@ def extract_query_info(user_query):  # function to extract city, property type, 
     return city, property_type, year
 
 
+def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history: list, is_prediction: bool):
+    if is_prediction:  # for future prediction
+        template = """
+            Based on the user's question and the predicted response, provide a structured breakdown of how the prediction was generated.
+
+            **Question:** {question}  
+            **Response:** {response}  
+
+            **Breakdown:**  
+            - Historical property tax data from 2013 to 2018 was gathered.  
+            - A **Linear Regression** model was trained on this data to identify patterns.  
+            - The trained model predicted the property tax value for the requested year.  
+            - The prediction is based on observed trends and may vary due to unforeseen factors.  
+
+            Ensure the explanation is clear, in past tense, and concise.
+        """
+    else:  # for existing data
+        template = """
+            Provide a structured breakdown of how the response was derived from the database.
+
+            **Question:** {question}  
+            **Response:** {response}  
+
+            **Breakdown:**  
+            - Step 1: Identify relevant tables and fields.  
+            - Step 2: Apply necessary filters (e.g., city, property type, year).  
+            - Step 3: Compute values using the database records.  
+            - Step 4: Format the response accordingly.  
+
+            The explanation should be in past tense and concise.
+        """
+
+    prompt = ChatPromptTemplate.from_template(template)
+
+    chain = (
+        RunnablePassthrough.assign(
+            schema=lambda _: get_schema(db),  # get cached schema
+        )
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    return chain.invoke({
+        "question": user_query,
+        "response": response,
+    })
+
+
 def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str, property_type: str, year: int,
                  df: pd.DataFrame):
+    chat_history = chat_history[-MAX_HISTORY:]  # trim history to last 3 messages
     # check for a prediction-based response
     prediction_response = get_prediction_response(user_query, city, property_type, year, df)
     if prediction_response:
-        return prediction_response  # if we have a prediction, return it immediately
+        return prediction_response  # if there's a prediction, return it immediately
     # handle collection gap queries
     if "collection gap" in user_query.lower() and year > 2018:
         gap = collection_gap(city, year, property_type, df)
@@ -157,19 +208,12 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str
     return get_sql_response(user_query, db, chat_history)
 
 
-if __name__ == "__main__":  # example usage
-    mysql_uri = mysql_uri_local  # taking local db
+if __name__ == "__main__":
+    mysql_uri = mysql_uri_local  # use local database
     db = SQLDatabase.from_uri(mysql_uri)
-    df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Pune.csv")  # load the tax data as an example
-    # For prediction
-    user_query = "What will be the tax demand for the year 2019 in Pune for residential?"
-    chat_history = []
-    city = "Pune"
-    property_type = "Residential"
-    year = 2019
-    response = get_response(user_query, db, chat_history, city, property_type, year, df)
-    print(response)
-    # For prediction (collection gap)
+    df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Pune.csv")  # load tax data
+
+    # example: normal query
     user_query = "What will be the property efficiency (residential) for the year 2019 in Pune?"
     chat_history = []
     city = "Pune"
@@ -177,12 +221,9 @@ if __name__ == "__main__":  # example usage
     year = 2019
     response = get_response(user_query, db, chat_history, city, property_type, year, df)
     print(response)
-    # For normal response
-    user_query = "What was the total property tax collection in 2013-14 residential for aundh in pune city?"
-    chat_history = []
-    city = "Pune"
-    property_type = "Residential"
-    year = 2014
-    response = get_response(user_query, db, chat_history, city, property_type, year, df)
-    print(response)
 
+    # example: user requests breakdown
+    user_query_breakdown = "Give me the breakdown"
+    is_prediction = True
+    breakdown = give_breakdown(user_query, response, db, chat_history, is_prediction)
+    print(breakdown)

@@ -16,7 +16,7 @@ llm = ChatGroq(
 )
 
 SCHEMA_CACHE = None  # global schema cache
-MAX_HISTORY = 3  # keep only the last 3 messages
+MAX_HISTORY = 2  # keep only the last 2 messages
 
 
 def get_schema(db: SQLDatabase):
@@ -37,14 +37,8 @@ def get_sql_chain(db: SQLDatabase):  # function to get sql query
         SQL Query: SELECT COUNT(Ward_Name) AS ward_count FROM pune;
         Question: What was the total property tax collection in 2013-14 residential for aundh in pune city?
         SQL Query: SELECT SUM(Tax_Collection_Cr_2013_14_Residential) AS total_tax_collected FROM pune WHERE Ward_Name = "Aundh";
-        Question: What was the total tax demand in 2015-16 commercial for erode in zone 3?
-        SQL Query: SELECT SUM(Tax_Demand_Cr_2015_16_Commercial) AS total_tax_demand FROM erode WHERE Zone_Name = "Zone-3";
-        Question: What was the property efficiency for the year 2015-16 commercial for Chennai?
-        SQL Query: SELECT ROUND((SUM(Tax_Collection_Cr_2015_16_Commercial) / SUM(Tax_Demand_Cr_2015_16_Commercial)) * 100, 2) AS property_efficiency_percent FROM chennai;
         Question: What was the property efficiency for pune from 2013-18 commercial?
         SQL Query: SELECT ROUND((SUM(Tax_Collection_Cr_2013_14_Commercial) + SUM(Tax_Collection_Cr_2014_15_Commercial) + SUM(Tax_Collection_Cr_2015_16_Commercial) + SUM(Tax_Collection_Cr_2016_17_Commercial) + SUM(Tax_Collection_Cr_2017_18_Commercial)) / (SUM(Tax_Demand_Cr_2013_14_Commercial) + SUM(Tax_Demand_Cr_2014_15_Commercial) + SUM(Tax_Demand_Cr_2015_16_Commercial) + SUM(Tax_Demand_Cr_2016_17_Commercial) + SUM(Tax_Demand_Cr_2017_18_Commercial)) * 100, 2) AS property_efficiency_percent FROM pune;
-        Question: What was the collection gap for the year 2016-17 residential for Thanjavur?
-        SQL Query: SELECT ROUND((SUM(Tax_Demand_Cr_2016_17_Residential) - SUM(Tax_Collection_Cr_2016_17_Residential)), 2) AS collection_gap FROM thanjvaur;
         Question: What was the collection gap for solapur from 2013-18 residential?
         SQL Query: SELECT ROUND((SUM(Tax_Demand_Cr_2013_14_Residential) + SUM(Tax_Demand_Cr_2014_15_Residential) + SUM(Tax_Demand_Cr_2015_16_Residential) + SUM(Tax_Demand_Cr_2016_17_Residential) + SUM(Tax_Demand_Cr_2017_18_Residential)) - (SUM(Tax_Collection_Cr_2013_14_Residential) + SUM(Tax_Collection_Cr_2014_15_Residential) + SUM(Tax_Collection_Cr_2015_16_Residential) + SUM(Tax_Collection_Cr_2016_17_Residential) + SUM(Tax_Collection_Cr_2017_18_Residential)), 2) AS collection_gap FROM solapur;
 
@@ -157,7 +151,7 @@ def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history
             **Breakdown:**  
             - Step 1: Identify relevant tables and fields.  
             - Step 2: Apply necessary filters (e.g., city, property type, year).  
-            - Step 3: {sql_query}  
+            - Step 3: Display the sql query {sql_query}  
             - Step 4: Compute values using the database records.  
             - Step 5: Format the response accordingly.  
 
@@ -207,10 +201,10 @@ if __name__ == "__main__":
     df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Pune.csv")  # load tax data
 
     # example: normal query
-    user_query = "What was the total tax demand in 2015-16 residential for Kothrud in Pune city?"
+    user_query = "What was the total tax collection in 2015-16 commercial for Hadapsar in Pune city?"
     chat_history = []
     city = "Pune"
-    property_type = "Residential"
+    property_type = "Commercial"
     year = 2015
     sql_query = get_sql_chain(db).invoke({"question": user_query, "chat_history": chat_history})  # get sql query
     print(sql_query)

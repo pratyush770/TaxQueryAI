@@ -8,8 +8,15 @@ from functions.prediction import train_prediction_model
 from langchain_core.prompts import ChatPromptTemplate
 import re
 
-model_name = "qwen-2.5-32b"  # name of model used
+model_name1 = "qwen-2.5-32b"  # name of model used
 llm = ChatGroq(
+    model_name=model_name1,
+    temperature=0.1,  # more accurate results
+    groq_api_key=sec_key
+)
+
+model_name = "llama-3.2-1b-preview"  # name of model used
+llm1 = ChatGroq(  # used only for breakdown function to optimize token usage
     model_name=model_name,
     temperature=0.1,  # more accurate results
     groq_api_key=sec_key
@@ -37,11 +44,15 @@ def get_sql_chain(db: SQLDatabase):  # function to get sql query
         SQL Query: SELECT COUNT(Ward_Name) AS ward_count FROM pune;
         Question: What was the total property tax collection in 2013-14 residential for aundh in pune city?
         SQL Query: SELECT SUM(Tax_Collection_Cr_2013_14_Residential) AS total_tax_collected FROM pune WHERE Ward_Name = "Aundh";
+        Question: What was the property efficiency for the year 2015-16 commercial for Chennai?
+        SQL Query: SELECT ROUND((SUM(Tax_Collection_Cr_2015_16_Commercial) / SUM(Tax_Demand_Cr_2015_16_Commercial)) * 100, 2) AS property_efficiency_percent FROM chennai;
         Question: What was the property efficiency for pune from 2013-18 commercial?
         SQL Query: SELECT ROUND((SUM(Tax_Collection_Cr_2013_14_Commercial) + SUM(Tax_Collection_Cr_2014_15_Commercial) + SUM(Tax_Collection_Cr_2015_16_Commercial) + SUM(Tax_Collection_Cr_2016_17_Commercial) + SUM(Tax_Collection_Cr_2017_18_Commercial)) / (SUM(Tax_Demand_Cr_2013_14_Commercial) + SUM(Tax_Demand_Cr_2014_15_Commercial) + SUM(Tax_Demand_Cr_2015_16_Commercial) + SUM(Tax_Demand_Cr_2016_17_Commercial) + SUM(Tax_Demand_Cr_2017_18_Commercial)) * 100, 2) AS property_efficiency_percent FROM pune;
+        Question: What was the collection gap for the year 2016-17 residential for Thanjavur?
+        SQL Query: SELECT ROUND(SUM(Tax_Demand_Cr_2016_17_Residential) - SUM(Tax_Collection_Cr_2016_17_Residential), 2) AS collection_gap_2016_17 FROM thanjavur;
         Question: What was the collection gap for solapur from 2013-18 residential?
         SQL Query: SELECT ROUND((SUM(Tax_Demand_Cr_2013_14_Residential) + SUM(Tax_Demand_Cr_2014_15_Residential) + SUM(Tax_Demand_Cr_2015_16_Residential) + SUM(Tax_Demand_Cr_2016_17_Residential) + SUM(Tax_Demand_Cr_2017_18_Residential)) - (SUM(Tax_Collection_Cr_2013_14_Residential) + SUM(Tax_Collection_Cr_2014_15_Residential) + SUM(Tax_Collection_Cr_2015_16_Residential) + SUM(Tax_Collection_Cr_2016_17_Residential) + SUM(Tax_Collection_Cr_2017_18_Residential)), 2) AS collection_gap FROM solapur;
-
+        
         Your turn:
         Question: {question}
         SQL Query:
@@ -129,6 +140,7 @@ def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history
     if is_prediction:  # for future prediction
         template = """
             Based on the user's question and the predicted response, provide a structured breakdown of how the prediction was generated.
+            The explanation should be in past tense and concise.
 
             **Question:** {question}  
             **Response:** {response} 
@@ -138,12 +150,11 @@ def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history
             - A **Linear Regression** model was trained on this data to identify patterns.  
             - The trained model predicted the property tax value for the requested year.  
             - The prediction is based on observed trends and may vary due to unforeseen factors.  
-
-            Ensure the explanation is clear, in past tense, and concise.
         """
     else:  # for existing data
         template = """
             Provide a structured breakdown of how the response was derived from the database.
+            The explanation should be in past tense and concise.
 
             **Question:** {question}  
             **Response:** {response}
@@ -154,8 +165,6 @@ def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history
             - Step 3: Display the sql query {sql_query}  
             - Step 4: Compute values using the database records.  
             - Step 5: Format the response accordingly.  
-
-            The explanation should be in past tense and concise.
         """
 
     prompt = ChatPromptTemplate.from_template(template)
@@ -165,7 +174,7 @@ def give_breakdown(user_query: str, response: str, db: SQLDatabase, chat_history
                 schema=lambda _: get_schema(db),  # get cached schema
             )
             | prompt
-            | llm
+            | llm1
             | StrOutputParser()
     )
 
@@ -198,14 +207,14 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list, city: str
 if __name__ == "__main__":
     mysql_uri = mysql_uri_local  # use local database
     db = SQLDatabase.from_uri(mysql_uri)
-    df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Pune.csv")  # load tax data
+    df = pd.read_csv("D:/TaxQueryAI/datasets/transformed_data/Property-Tax-Erode.csv")  # load tax data
 
     # example: normal query
-    user_query = "What was the total tax collection in 2015-16 commercial for Hadapsar in Pune city?"
+    user_query = "What was the tax demand in 2016-17 residential for ward 3 in erode?"
     chat_history = []
-    city = "Pune"
-    property_type = "Commercial"
-    year = 2015
+    city = "Erode"
+    property_type = "Residential"
+    year = 2016
     sql_query = get_sql_chain(db).invoke({"question": user_query, "chat_history": chat_history})  # get sql query
     print(sql_query)
     response = get_response(user_query, db, chat_history, city, property_type, year, df)  # get natural language response
